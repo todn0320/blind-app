@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>시각장애인용 실시간 장면 설명</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: #f5f5f7;
+        color: #111827;
+      }
+
+      header {
+        padding: 20px 24px 8px;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      header p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      main {
+        max-width: 1000px;
+        margin: 0 auto 32px;
+        padding: 0 16px 24px;
+        display: grid;
+        grid-template-columns: minmax(0, 3fr) minmax(0, 2.2fr);
+        gap: 16px;
+      }
+
+      @media (max-width: 840px) {
+        main {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 16px 18px 18px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      }
+
+      .card h2 {
+        margin: 0 0 10px;
+        font-size: 16px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-weight: 500;
+      }
+
+      .video-wrapper {
+        border-radius: 14px;
+        overflow: hidden;
+        background: #111827;
+        position: relative;
+      }
+
+      video {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .helper-text {
+        margin-top: 6px;
+        font-size: 11px;
+        color: #6b7280;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border: none;
+        border-radius: 999px;
+        padding: 7px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: transform 0.05s ease, box-shadow 0.05s ease,
+          background 0.1s ease;
+      }
+
+      .btn-primary {
+        background: #4f46e5;
+        color: #ffffff;
+        box-shadow: 0 8px 16px rgba(79, 70, 229, 0.35);
+      }
+
+      .btn-primary:hover {
+        background: #4338ca;
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.45);
+      }
+
+      .btn-secondary {
+        background: #e5e7eb;
+        color: #111827;
+      }
+
+      .btn-secondary:hover {
+        background: #d1d5db;
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+        box-shadow: none;
+      }
+
+      .btn[disabled] {
+        opacity: 0.6;
+        cursor: default;
+        box-shadow: none;
+        transform: none;
+      }
+
+      .caption-box {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #f9fafb;
+        font-size: 13px;
+        border: 1px solid #e5e7eb;
+        min-height: 56px;
+        white-space: pre-line;
+      }
+
+      .caption-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .caption-text {
+        margin-top: 4px;
+      }
+
+      .field-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        margin-bottom: 4px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      #questionInput {
+        flex: 1;
+        border-radius: 999px;
+        border: 1px solid #e5e7eb;
+        padding: 8px 12px;
+        font-size: 13px;
+        outline: none;
+      }
+
+      #questionInput:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.4);
+      }
+
+      #qaLog {
+        margin-top: 10px;
+        padding: 8px 10px;
+        background: #f9fafb;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        font-size: 13px;
+        height: 220px;
+        overflow-y: auto;
+        white-space: pre-line;
+      }
+
+      .log-me {
+        color: #111827;
+        font-weight: 500;
+      }
+
+      .log-ai {
+        color: #1d4ed8;
+      }
+
+      .log-system {
+        color: #b91c1c;
+      }
+
+      footer {
+        text-align: center;
+        font-size: 11px;
+        color: #9ca3af;
+        padding-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>시각장애인용 실시간 장면 설명 & 질문</h1>
+      <p>카메라에 비친 현재 화면을 설명하고, 텍스트 · 음성으로 질문할 수 있어요.</p>
+    </header>
+
+    <main>
+      <!-- 왼쪽: 카메라 + 캡션 -->
+      <section class="card">
+        <h2>
+          실시간 화면
+          <span class="badge">카메라</span>
+        </h2>
+
+        <div class="video-wrapper">
+          <video id="video" autoplay playsinline></video>
+        </div>
+        <canvas
+          id="captureCanvas"
+          width="320"
+          height="240"
+          style="display: none"
+        ></canvas>
+
+        <p class="helper-text">
+          화면을 확인한 뒤, 아래 버튼을 누르면 지금 장면을 분석하고 한국어로 읽어줘요.
+        </p>
+
+        <button id="captionBtn" class="btn btn-primary">
+          ▷ 지금 장면 설명 듣기
+        </button>
+
+        <div class="caption-box" id="captionResult">
+          <div class="caption-label">현재 장면 설명</div>
+          <div class="caption-text" id="captionTextInner">
+            아직 분석한 장면이 없습니다. 버튼을 눌러 설명을 들어보세요.
+          </div>
+        </div>
+      </section>
+
+      <!-- 오른쪽: 질문 영역 -->
+      <section class="card">
+        <h2>
+          장면에 대해 질문하기
+          <span class="badge">Q&A</span>
+        </h2>
+
+        <div style="margin-bottom: 8px">
+          <div class="field-label">텍스트로 질문</div>
+          <div class="input-row">
+            <input
+              id="questionInput"
+              type="text"
+              autocomplete="off"
+              placeholder="예) 여자의 옷 색깔은 뭐예요?"
+            />
+            <button id="askBtn" class="btn btn-secondary">질문 보내기</button>
+          </div>
+          <p class="helper-text">
+            질문을 입력 후 <b>Enter</b> 키를 눌러도 전송됩니다.
+          </p>
+        </div>
+
+        <div>
+          <div class="field-label">음성으로 질문</div>
+          <button id="voiceBtn" class="btn btn-secondary">
+            🎙 음성 질문 시작
+          </button>
+          <p class="helper-text">
+            버튼을 한 번 눌러 녹음 시작 → 다시 눌러 전송하면, STT 후 답을 읽어줍니다.
+          </p>
+        </div>
+
+        <div id="qaLog"></div>
+      </section>
+    </main>
+
+    <footer>© 실험용 BLIND_APP · 문채은 엄다현 최예나 프로젝트</footer>
+
+    <!-- static_url_path="/" 이라서 /script.js 로 접근 -->
+    <script src="/script.js"></script>
+  </body>
+</html>
