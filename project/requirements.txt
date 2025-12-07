@@ -9,3 +9,4 @@ soundfile
 requests
 numpy
 Pillow
+peft
