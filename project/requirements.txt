@@ -1,1 +1,11 @@
 flask
+gunicorn
+openai
+torch
+torchvision
+transformers
+pydub
+soundfile
+requests
+numpy
+Pillow
